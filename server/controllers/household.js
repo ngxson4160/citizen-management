@@ -36,3 +36,70 @@ const createHousehold = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+const editHousehold = async (req, res) => {
+  try {
+    const householdId = req.params.householdId;
+
+    const apartmentNumber = req.body.apartmentNumber;
+    const place = req.body.place;
+
+    const headMember = req.body.headMember;
+    const newRole = req.body.newRole;
+
+    const household = await Household.findOne({ _id: householdId });
+
+    if (household.apartmentNumber != apartmentNumber) {
+      household.change.push({
+        content: `Thay đổi số nhà: ${household.apartmentNumber} -> ${apartmentNumber}`,
+        date: Date.now(),
+      });
+      household.apartmentNumber = apartmentNumber;
+    }
+    if (household.place != place) {
+      household.place = place;
+      household.change.push({
+        content: `Thay đổi địa chỉ: ${household.place} -> ${place}`,
+        date: Date.now(),
+      });
+    }
+
+    if (household.headMember != headMember) {
+      if (household.headMember) {
+        const oldHead = await Person.findOne({ _id: household.headMember });
+        const newHead = await Person.findOne({ _id: headMember });
+        oldHead.relationship = newRole;
+        newHead.relationship = 0;
+        await oldHead.save();
+        await newHead.save();
+
+        household.members = household.members.filter(
+          (per) => per._id.toString() != newHead._id.toString()
+        );
+        household.members.push(oldHead._id);
+        household.headMember = headMember;
+        household.change.push({
+          content: `Thay đổi chủ hộ: ${oldHead.name} -> ${newHead.name}`,
+          date: Date.now(),
+        });
+      } else {
+        const newHead = await Person.findOne({ _id: headMember });
+        newHead.relationship = 0;
+        await newHead.save();
+
+        household.members = household.members.filter(
+          (per) => per._id.toString() != newHead._id.toString()
+        );
+        household.headMember = headMember;
+        household.change.push({
+          content: `Thêm chủ hộ: ${newHead.name}`,
+          date: Date.now(),
+        });
+      }
+    }
+    await household.save();
+    res.status(200).json('Chỉnh sửa thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
