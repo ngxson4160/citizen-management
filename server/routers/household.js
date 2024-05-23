@@ -138,3 +138,112 @@ router.post('/', householdController.createHousehold);
  *         description: The message of errors
  */
 router.put('/:householdId/', householdController.editHousehold);
+
+/**
+ * @swagger
+ * /household/{householdId}:
+ *   delete:
+ *     summary: Delete a household
+ *     operationId: deleteHousehold
+ *     tags: [household]
+ *     parameters:
+ *       - in: path
+ *         name: householdId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The household id
+ *     responses:
+ *       200:
+ *         description: The message household was deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *       500:
+ *         description: The message of errors
+ */
+router.delete('/:householdId', householdController.deleteHousehold);
+
+/**
+ * @swagger
+ * /household/{householdId}/:
+ *   get:
+ *     summary: Get detail of a household
+ *     operationId: getHouseholdDetail
+ *     tags: [household]
+ *     parameters:
+ *       - in: path
+ *         name: householdId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The household id
+ *     responses:
+ *       200:
+ *         description: Detail of the household
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   headId:
+ *                     type: integer
+ *                     description: Head member Id
+ *                   members:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         memberId:
+ *                           type: integer
+ *                   number:
+ *                     type: integer
+ *                   apartmentNumber:
+ *                     type: integer
+ *                   place:
+ *                     type: string
+ *                   change:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         content:
+ *                           type: string
+ *                         date:
+ *                           type: string
+ *                   paidStatus:
+ *                     type: object
+ *                     properties:
+ *                       money:
+ *                         $ref: '#/components/schemas/Money'
+ *                       household:
+ *                         type: integer
+ *                       paidMoney:
+ *                         type: number
+ *                       paidHistory:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             value:
+ *                               type: number
+ *                             paidDate:
+ *                               type: number
+ *                       requiredMoney:
+ *                         type: number
+ *                       totalRequiredMoney:
+ *                         type: number     
+ *       500:
+ *         description: The message of errors
+ */
+router.get('/:householdId/', householdController.getHouseholdDetail);
+
+// hasn't impelmented in swagger yet
+router.post('/separation', householdController.separationHousehold);
+
+export default router;

@@ -1,3 +1,10 @@
+import Person from '../models/person.js';
+import Identity from '../models/identity.js';
+import { getHouseholdPaidStatus } from './money.js';
+import Household from '../models/household.js';
+import mongoose from 'mongoose';
+import CollectStatus from '../models/collectStatus.js';
+
 const getHousehold = async (req, res) => {
   try {
     const household = await Household.find();
@@ -102,4 +109,130 @@ const editHousehold = async (req, res) => {
   } catch (error) {
     res.status(500).json(error);
   }
+};
+
+const deleteHousehold = async (req, res) => {
+  try {
+    const householdId = req.params.householdId;
+    if (!mongoose.isValidObjectId(householdId))
+      res.status(400).json('Hộ khẩu không tồn tại');
+    const household = await Household.findOne({
+      _id: householdId.toString(),
+    }).exec();
+    !household && res.status(400).json('Hộ khẩu không tồn tại');
+
+    if (household.headMember) {
+      const person = await Person.findOne({ _id: household.headMember });
+      await Identity.deleteOne({ _id: person.identity });
+      await Person.deleteOne({ _id: person._id });
+    }
+    household.members.forEach(async (mem) => {
+      const person = await Person.findOne({ _id: mem._id });
+      await Identity.deleteOne({ _id: person.identity });
+      await Person.deleteOne({ _id: person._id });
+    });
+
+    await CollectStatus.deleteMany({ household: householdId });
+
+    await Household.deleteOne({ _id: householdId });
+    res.status(200).json('Xóa hộ khẩu thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const deletePersonFromHousehold = async (person) => {
+  const household = await Household.findOne({ _id: person.household });
+  if (household.headMember?.toString() == person._id.toString()) {
+    household.headMember = null;
+    household.change.push({
+      content: `Chuyển chủ hộ: ${person.name}`,
+      date: Date.now(),
+    });
+    await household.save();
+  } else {
+    household.members = household.members.filter(
+      (per) => per._id.toString() != person._id.toString()
+    );
+    household.change.push({
+      content: `Chuyển nhân khẩu: ${person.name}`,
+      date: Date.now(),
+    });
+    await household.save();
+  }
+};
+
+const getHouseholdDetail = async (req, res) => {
+  try {
+    const householdId = req.params.householdId;
+
+    if (!mongoose.isValidObjectId(householdId))
+      res.status(400).json('Hộ khẩu không tồn tại');
+    const household = await Household.findOne({
+      _id: householdId.toString(),
+    }).exec();
+    !household && res.status(400).json('Hộ khẩu không tồn tại');
+
+    res.status(200).json({
+      ...household._doc,
+      paidStatus: await getHouseholdPaidStatus(householdId),
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const separationHousehold = async (req, res) => {
+  try {
+    const householdId = req.body.householdId;
+    var household;
+    const people = req.body.people;
+    const apartmentNumber = req.body.apartmentNumber;
+    const place = req.body.place;
+
+    if (householdId) {
+      household = await Household.findOne({ _id: householdId });
+    } else {
+      household = new Household({
+        apartmentNumber: apartmentNumber,
+        place: place,
+      });
+    }
+
+    people.forEach(async (per) => {
+      const person = await Person.findOne({ _id: per.id });
+      await deletePersonFromHousehold(person);
+      if (per.relationship == 0) {
+        household.headMember = per.id;
+        await household.save();
+      } else {
+        household.members.push(per.id);
+        await household.save();
+      }
+
+      person.relationship = per.relationship;
+      person.household = household._id;
+      person.note = 0;
+      await person.save();
+
+      household.change.push({
+        content: `Thêm nhân khẩu: ${person.name}`,
+        date: Date.now(),
+      });
+      await household.save();
+    });
+
+    res.status(201).json('Tách hộ khẩu thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export {
+  getHousehold,
+  editHousehold,
+  deleteHousehold,
+  createHousehold,
+  separationHousehold,
+  getHouseholdDetail,
 };
