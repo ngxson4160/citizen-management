@@ -1,3 +1,10 @@
+import Person from '../models/person.js';
+import Identity from '../models/identity.js';
+import { getHouseholdPaidStatus } from './money.js';
+import Household from '../models/household.js';
+import mongoose from 'mongoose';
+import CollectStatus from '../models/collectStatus.js';
+
 const getHousehold = async (req, res) => {
   try {
     const household = await Household.find();
@@ -99,6 +106,37 @@ const editHousehold = async (req, res) => {
     }
     await household.save();
     res.status(200).json('Chỉnh sửa thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+
+const deleteHousehold = async (req, res) => {
+  try {
+    const householdId = req.params.householdId;
+    if (!mongoose.isValidObjectId(householdId))
+      res.status(400).json('Hộ khẩu không tồn tại');
+    const household = await Household.findOne({
+      _id: householdId.toString(),
+    }).exec();
+    !household && res.status(400).json('Hộ khẩu không tồn tại');
+
+    if (household.headMember) {
+      const person = await Person.findOne({ _id: household.headMember });
+      await Identity.deleteOne({ _id: person.identity });
+      await Person.deleteOne({ _id: person._id });
+    }
+    household.members.forEach(async (mem) => {
+      const person = await Person.findOne({ _id: mem._id });
+      await Identity.deleteOne({ _id: person.identity });
+      await Person.deleteOne({ _id: person._id });
+    });
+
+    await CollectStatus.deleteMany({ household: householdId });
+
+    await Household.deleteOne({ _id: householdId });
+    res.status(200).json('Xóa hộ khẩu thành công');
   } catch (error) {
     res.status(500).json(error);
   }

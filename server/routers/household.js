@@ -138,3 +138,29 @@ router.post('/', householdController.createHousehold);
  *         description: The message of errors
  */
 router.put('/:householdId/', householdController.editHousehold);
+
+/**
+ * @swagger
+ * /household/{householdId}:
+ *   delete:
+ *     summary: Delete a household
+ *     operationId: deleteHousehold
+ *     tags: [household]
+ *     parameters:
+ *       - in: path
+ *         name: householdId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The household id
+ *     responses:
+ *       200:
+ *         description: The message household was deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *       500:
+ *         description: The message of errors
+ */
+router.delete('/:householdId', householdController.deleteHousehold);
