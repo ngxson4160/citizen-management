@@ -111,7 +111,6 @@ const editHousehold = async (req, res) => {
   }
 };
 
-
 const deleteHousehold = async (req, res) => {
   try {
     const householdId = req.params.householdId;
@@ -140,4 +139,32 @@ const deleteHousehold = async (req, res) => {
   } catch (error) {
     res.status(500).json(error);
   }
+};
+
+const getHouseholdDetail = async (req, res) => {
+  try {
+    const householdId = req.params.householdId;
+
+    if (!mongoose.isValidObjectId(householdId))
+      res.status(400).json('Hộ khẩu không tồn tại');
+    const household = await Household.findOne({
+      _id: householdId.toString(),
+    }).exec();
+    !household && res.status(400).json('Hộ khẩu không tồn tại');
+
+    res.status(200).json({
+      ...household._doc,
+      paidStatus: await getHouseholdPaidStatus(householdId),
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export {
+  getHousehold,
+  editHousehold,
+  deleteHousehold,
+  createHousehold,
+  getHouseholdDetail,
 };
