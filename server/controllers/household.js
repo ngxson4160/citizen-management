@@ -19,3 +19,20 @@ const getHousehold = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+const createHousehold = async (req, res) => {
+  try {
+    const apartmentNumber = req.body.apartmentNumber;
+    const place = req.body.place;
+
+    const household = new Household({
+      apartmentNumber: apartmentNumber,
+      place: place,
+    });
+    await household.save();
+
+    res.status(201).json(household);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
