@@ -141,6 +141,27 @@ const deleteHousehold = async (req, res) => {
   }
 };
 
+const deletePersonFromHousehold = async (person) => {
+  const household = await Household.findOne({ _id: person.household });
+  if (household.headMember?.toString() == person._id.toString()) {
+    household.headMember = null;
+    household.change.push({
+      content: `Chuyển chủ hộ: ${person.name}`,
+      date: Date.now(),
+    });
+    await household.save();
+  } else {
+    household.members = household.members.filter(
+      (per) => per._id.toString() != person._id.toString()
+    );
+    household.change.push({
+      content: `Chuyển nhân khẩu: ${person.name}`,
+      date: Date.now(),
+    });
+    await household.save();
+  }
+};
+
 const getHouseholdDetail = async (req, res) => {
   try {
     const householdId = req.params.householdId;
@@ -161,10 +182,57 @@ const getHouseholdDetail = async (req, res) => {
   }
 };
 
+const separationHousehold = async (req, res) => {
+  try {
+    const householdId = req.body.householdId;
+    var household;
+    const people = req.body.people;
+    const apartmentNumber = req.body.apartmentNumber;
+    const place = req.body.place;
+
+    if (householdId) {
+      household = await Household.findOne({ _id: householdId });
+    } else {
+      household = new Household({
+        apartmentNumber: apartmentNumber,
+        place: place,
+      });
+    }
+
+    people.forEach(async (per) => {
+      const person = await Person.findOne({ _id: per.id });
+      await deletePersonFromHousehold(person);
+      if (per.relationship == 0) {
+        household.headMember = per.id;
+        await household.save();
+      } else {
+        household.members.push(per.id);
+        await household.save();
+      }
+
+      person.relationship = per.relationship;
+      person.household = household._id;
+      person.note = 0;
+      await person.save();
+
+      household.change.push({
+        content: `Thêm nhân khẩu: ${person.name}`,
+        date: Date.now(),
+      });
+      await household.save();
+    });
+
+    res.status(201).json('Tách hộ khẩu thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
 export {
   getHousehold,
   editHousehold,
   deleteHousehold,
   createHousehold,
+  separationHousehold,
   getHouseholdDetail,
 };

@@ -242,3 +242,8 @@ router.delete('/:householdId', householdController.deleteHousehold);
  *         description: The message of errors
  */
 router.get('/:householdId/', householdController.getHouseholdDetail);
+
+// hasn't impelmented in swagger yet
+router.post('/separation', householdController.separationHousehold);
+
+export default router;
