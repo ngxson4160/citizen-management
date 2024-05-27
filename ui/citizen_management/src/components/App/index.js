@@ -2,7 +2,6 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Route, Switch, withRouter } from 'react-router-dom';
 
-
 import Account from '../Account/Account';
 import AlertCustom from '../Alert';
 import Header from '../Header';
@@ -24,8 +23,36 @@ import userStore from '../../stores/userStore';
 import './styles.css';
 
 class App extends React.Component {
-  render() {
-    
+  getUnAuthorizedPage() {
+    return (
+      <Switch>
+        <Route exact path={routingPaths.home} component={Home} />
+        <Route exact path={routingPaths.people} component={UnAuthorizedPage} />
+        <Route path={routingPaths.personDetail} component={UnAuthorizedPage} />
+        <Route
+          exact
+          path={routingPaths.households}
+          component={UnAuthorizedPage}
+        />
+        <Route
+          path={routingPaths.householdDetail}
+          component={UnAuthorizedPage}
+        />
+        <Route
+          exact
+          path={routingPaths.periodMoney}
+          component={UnAuthorizedPage}
+        />
+        <Route
+          exact
+          path={routingPaths.contributionMoney}
+          component={UnAuthorizedPage}
+        />
+        <Route path={routingPaths.moneyDetail} component={UnAuthorizedPage} />
+        <Route path={routingPaths.account} component={Account} />
+        <Route component={NotFoundPage} />
+      </Switch>
+    );
   }
 }
 
