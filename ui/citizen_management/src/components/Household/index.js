@@ -68,20 +68,36 @@ class Household extends React.Component {
     repaintFloatingActionButton();
   }
 
-  myCommand = (e) => {
-    let rows = this.grid.instance.getVisibleRows();
-    let row = rows[this.state.selectedRowIndex];
-    this.setState({
-      isComponentVisible: !this.state.isComponentVisible,
-      info: row.data,
-    });
-  };
+  editRow() {
+    this.grid.instance.editRow(this.state.selectedRowIndex);
+    this.grid.instance.deselectAll();
+  }
 
-  close = () => {
-    this.setState({
-      isComponentVisible: !this.state.isComponentVisible,
-    });
-  };
+  deleteRow() {
+    this.grid.instance.deleteRow(this.state.selectedRowIndex);
+    this.grid.instance.deselectAll();
+  }
+
+  addRow() {
+    this.grid.instance.addRow();
+    this.grid.instance.deselectAll();
+  }
+
+  // myCommand = (e) => {
+  //   let rows=this.grid.instance.getVisibleRows()
+  //   let row=rows[this.state.selectedRowIndex]
+  //   this.setState({
+  //           isComponentVisible: !this.state.isComponentVisible,
+  //           info:row.data
+  //       });
+
+  //   }
+
+  // close=()=>{
+  //     this.setState({
+  //         isComponentVisible: !this.state.isComponentVisible
+
+  // })}
 
   render() {
     const { selectedRowIndex } = this.state;
