@@ -105,3 +105,73 @@ const addPerson = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+const editPerson = async (req, res) => {
+  try {
+    const personId = req.params.personId;
+    const relationship = req.body.relationship;
+
+    const name = req.body.name;
+    const aliases = req.body.aliases;
+    const gender = req.body.gender;
+    const dateOfBirth = req.body.dateOfBirth;
+    const birthPlace = req.body.birthPlace;
+    const nation = req.body.nation;
+    const job = req.body.job;
+    const jobAddress = req.body.jobAddress;
+    const note = req.body.note;
+
+    const numberIdentity = req.body.numberIdentity;
+    const dateOfIssue = req.body.dateOfIssue;
+    const placeOfIssue = req.body.placeOfIssue;
+
+    const person = await Person.findOne({ _id: personId });
+
+    const identity = await Identity.findOne({ _id: person.identity });
+    identity.dateOfIssue = dateOfIssue;
+    identity.placeOfIssue = placeOfIssue;
+    identity.numberIdentity = numberIdentity;
+    await identity.save();
+
+    if (relationship != person.relationship) {
+      const household = await Household.findOne({ _id: person.household });
+      if (person.relationship == 0) {
+        household.headMember = null;
+      } else {
+        household.members = household.members.filter(
+          (mem) => mem.toString() != person._id.toString()
+        );
+      }
+      if (relationship == 0) {
+        household.headMember = person._id;
+        household.change.push({
+          content: `Thay đổi thông tin chủ hộ: ${person.name}`,
+          date: Date.now(),
+        });
+      } else {
+        household.members.push(person._id);
+        household.change.push({
+          content: `Chỉnh sửa thông tin nhân khẩu: ${person.name}`,
+          date: Date.now(),
+        });
+      }
+      await household.save();
+    }
+
+    person.name = name;
+    person.aliases = aliases;
+    person.gender = gender;
+    person.nation = nation;
+    person.job = job;
+    person.jobAddress = jobAddress;
+    person.dateOfBirth = dateOfBirth;
+    person.birthPlace = birthPlace;
+    person.relationship = relationship;
+    person.note = note;
+    await person.save();
+
+    res.status(200).json('Chỉnh sửa thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
