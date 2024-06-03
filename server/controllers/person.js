@@ -175,3 +175,115 @@ const editPerson = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+const deletePerson = async (req, res) => {
+  try {
+    const personId = req.params.personId;
+    const person = await Person.findOne({ _id: personId });
+
+    await Identity.deleteOne({ _id: person.identity });
+
+    const household = await Household.findOne({ _id: person.household });
+    if (household?.headMember?.toString() == personId.toString()) {
+      if (household.members.length > 0) {
+        household.headMember = null;
+      } else {
+        await Household.deleteOne({ _id: person.household });
+      }
+    } else {
+      household.members = household.members.filter(
+        (perId) => perId.toString() != personId.toString()
+      );
+    }
+    await household.save();
+
+    await Person.deleteOne({ _id: personId });
+    res.status(200).json('Xóa thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const registerForTemporaryResidence = async (req, res) => {
+  try {
+    const personId = req.params.personId;
+
+    const place = req.body.place;
+    const date = req.body.date;
+    const note = req.body.note;
+
+    const person = await Person.findOne({ _id: personId });
+    person.note = 2;
+    person.residencyHistory.push({
+      place: place,
+      date: date,
+      note: note,
+    });
+    await person.save();
+    res.status(200).json('Khai báo thành công');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const reportDeath = async (req, res) => {
+  try {
+    const personId = req.params.personId;
+    const reportPersonId = req.body.reportPersonId;
+    const deathReason = req.body.deathReason;
+    const deathDay = req.body.deathDay;
+    const deathPlace = req.body.deathPlace;
+
+    const person = await Person.findOne({ _id: personId });
+
+    if (person.relationship === 0) {
+      await Household.findOneAndUpdate(
+        { _id: person.household },
+        {
+          headMember: null,
+          $push: {
+            change: {
+              content: `khai tử cho: ${person.name}`,
+              date: Date.now(),
+            },
+          },
+        }
+      );
+    } else {
+      const household = await Household.findOne({ _id: person.household });
+      household.members = household.members.filter(
+        (per) => per._id.toString() != person._id.toString()
+      );
+      household.change.push({
+        content: `khai tử cho: ${person.name}`,
+        date: Date.now(),
+      });
+      await household.save();
+    }
+
+    const newReport = new DeathReport({
+      deadPerson: personId,
+      reportPerson: reportPersonId,
+      deathReason: deathReason,
+      deathDay: deathDay,
+      deathPlace: deathPlace,
+    });
+    await newReport.save();
+    person.deathReport = newReport._id;
+    person.note = 3;
+    await person.save();
+    res.status(200).json(person);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export {
+  getPeople,
+  getPersonDetail,
+  addPerson,
+  editPerson,
+  deletePerson,
+  registerForTemporaryResidence,
+  reportDeath,
+};
