@@ -22,6 +22,8 @@ import commonStore from '../../stores/commonStore';
 import { routingPaths } from '../../stores/routingStore';
 import userStore from '../../stores/userStore';
 import './styles.css';
+import ChangePassword from '../Account/changePassword';
+import changePassword from '../Account/changePassword';
 
 class App extends React.Component {
   getUnAuthorizedPage() {
@@ -51,6 +53,7 @@ class App extends React.Component {
         />
         <Route path={routingPaths.moneyDetail} component={UnAuthorizedPage} />
         <Route path={routingPaths.account} component={Account} />
+        <Route path={routingPaths.changePassword} component={changePassword}/>
         <Route component={NotFoundPage} />
       </Switch>
     );
@@ -63,6 +66,7 @@ class App extends React.Component {
         <Route exact path={routingPaths.people} component={People} />
         <Route path={routingPaths.personDetail} component={PersonDetail} />
         <Route exact path={routingPaths.households} component={Household} />
+        <Route path={routingPaths.changePassword} component={changePassword}/>
         <Route
           path={routingPaths.householdDetail}
           component={HouseholdDetail}

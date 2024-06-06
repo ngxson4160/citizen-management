@@ -82,10 +82,7 @@ class MoneyDetail extends React.Component {
           <Selection mode="single" />
           <SearchPanel visible={true} />
           <FilterRow visible={true} />
-          <Editing
-            mode="popup"
-            allowUpdating={userStore.userDetail.role < 3 ? true : false}
-          >
+          <Editing mode="popup" allowUpdating={userStore.userDetail.role < 3 ? true : false}>
             <Popup title="Chi tiết" showTitle={true} width={700} height={300} />
             <Form>
               <Item itemType="group" colCount={2} colSpan={2}>

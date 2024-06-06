@@ -47,7 +47,7 @@ import * as householdController from '../controllers/household.js';
   *   description: Households managing API
   */
 
- const router = express.Router();
+const router = express.Router();
 
 /**
  * @swagger

@@ -6,6 +6,7 @@ const APIS = {
   user: {
     signIn: (data) => axios.post(`${API_ROOT}/auth/sign-in`, data),
     signUp: (data) => axios.post(`${API_ROOT}/auth/sign-up`, data),
+    changePassword: (data)=> axios.post(`${API_ROOT}/auth/change-password`, data),
   },
   household: {
     getHouseholds: () => axios.get(`${API_ROOT}/household`),

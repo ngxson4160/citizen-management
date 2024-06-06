@@ -3,7 +3,7 @@
   z-index: 2;
   top: 10%;
   left: 25%;
-
+ 
   background-color: rgb(255, 255, 255);
 
   width: 50%;
@@ -60,6 +60,6 @@
 }
 
 .require:after {
-  content: '*';
+  content:"*";
   color: red;
 }

@@ -10,6 +10,7 @@ const routingPaths = {
   periodMoney: '/money/period',
   contributionMoney: '/money/contribution',
   moneyDetail: '/money/:moneyId',
+  changePassword: '/account/change-password',
 };
 
 export { routingPaths };

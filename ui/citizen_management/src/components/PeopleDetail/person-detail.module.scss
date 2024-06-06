@@ -4,7 +4,7 @@
   border-radius: 10px;
   width: 80%;
   padding: 10px 7%;
-
+ 
   background-color: white;
 
   &_title {
@@ -17,39 +17,39 @@
   &_content {
     padding-left: 10px;
     font-size: 18px;
-    &_basic {
+    &_basic{
       float: left;
       width: 50%;
       padding: 12px;
     }
-    &_name {
+    &_name{
       font-size: 26px;
       font-weight: 550;
       margin-bottom: 20px;
       text-shadow: 2px 2px 2px #c2c2c2;
     }
-    &_column {
+    &_column{
       float: left;
       width: 33%;
       padding: 12px;
-      &_infor {
+      &_infor{
         font-weight: 550;
         font-size: 18px;
       }
     }
-    &_note {
+    &_note{
       float: left;
       width: 100%;
       margin-top: 15px;
     }
-    &_resident {
+    &_resident{
       float: left;
       width: 100%;
       margin-top: 20px;
     }
   }
-  &_content::after {
-    content: '';
+  &_content::after{
+    content: "";
     display: table;
     clear: both;
   }

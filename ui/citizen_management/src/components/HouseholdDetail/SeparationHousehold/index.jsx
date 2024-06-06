@@ -231,4 +231,4 @@ const SeparationHousehold = ({ members, setTopComp, householdId }) => {
   );
 };
 
-export default SeparationHousehold
+export default SeparationHousehold;

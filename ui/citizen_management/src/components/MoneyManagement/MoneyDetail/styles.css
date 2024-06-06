@@ -1,4 +1,4 @@
-#table {
+#table{
   padding: 2em;
   margin-left: 12%;
   width: 76%;
@@ -7,8 +7,8 @@
   text-align: center;
   background-color: white;
   border-radius: 10px;
-  -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.63);
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.63);
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.63); 
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.63);
 }
 
 #table .dx-datagrid-rowsview .dx-row-focused.dx-data-row > td:not(.dx-focused) {
@@ -21,39 +21,39 @@
   font-size: 18px;
 }
 
-.headerColumn[role='columnheader'] {
+.headerColumn[role="columnheader"]{  
   font-size: 20px;
   color: black;
 }
 
-.detail {
+.detail{
   text-align: left;
   font-size: 20px;
   padding-left: 5%;
   padding-bottom: 2%;
 }
 
-.infor {
+.infor{
   margin: 2em;
   margin-top: -1px;
   background-color: #fff;
-  -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.63);
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.63);
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.63); 
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.63);
   border-radius: 10px;
 }
 
-.infor div {
+.infor div{
   margin-top: 2px;
 }
 
-.header {
+.header{
   font-size: 25px;
 }
 
-.textCol {
-  text-align: center !important;
+.textCol{
+  text-align: center!important;
 }
 
-.dx-datagrid-rowsview .dx-row:nth-child(odd) {
+.dx-datagrid-rowsview .dx-row:nth-child(odd){
   background-color: #f1f0f0;
 }
