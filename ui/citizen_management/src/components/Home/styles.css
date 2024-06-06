@@ -37,6 +37,6 @@
 
 .no-login{
     min-height: 90vh;
-    background: url(https://scontent-hkg4-2.xx.fbcdn.net/v/t1.15752-9/445821571_1011899460293635_8818237510472006702_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=5f2048&_nc_ohc=Ko46VwKJ8fYQ7kNvgGMjHJe&_nc_ht=scontent-hkg4-2.xx&oh=03_Q7cD1QGgLtKMfTZ8EQ5DwBHbQVI5o9nkzplN9ILJsPFWMd5LNg&oe=668678FA) no-repeat;
+    background: url(welcome.jpg) no-repeat;
     background-size: cover;
 }
