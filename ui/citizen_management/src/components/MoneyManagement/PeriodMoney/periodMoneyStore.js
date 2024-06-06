@@ -36,7 +36,7 @@ class PeriodMoneyStore {
         alertService.error(errorMessage);
       });
   }
-
+  
   updateMoney(money) {
     const pos = this.moneyList.findIndex(
       (element) => element._id === money.data._id

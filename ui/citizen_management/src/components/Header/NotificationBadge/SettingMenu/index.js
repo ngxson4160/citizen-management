@@ -19,6 +19,12 @@ class SettingMenu extends React.Component {
             </SettingMenuIcon>
             <SettingMenuLabel>Cài đặt</SettingMenuLabel>
           </SettingMenuLink>
+          <SettingMenuLink to={'/account/change-password'}>
+            <SettingMenuIcon>
+              <i class="fas fa-cog"></i>
+            </SettingMenuIcon>
+            <SettingMenuLabel>Đổi mật khẩu</SettingMenuLabel>
+          </SettingMenuLink>
           <SettingMenuLink to={'/help'}>
             <SettingMenuIcon>
               <i class="fas fa-question-circle"></i>

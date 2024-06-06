@@ -169,3 +169,132 @@ const getMoneyCollectStatus = async (moneyId) => {
 
   return response;
 };
+
+const getHouseholdPaidStatus = async (householdId) => {
+  const response = [];
+
+  const query = await Promise.all([
+    Household.findOne({ _id: householdId }),
+    CollectStatus.find({ household: householdId }).populate('money'),
+  ]);
+  const household = query[0];
+  const collectStatus = query[1];
+  let haveStatusMoneysId = [];
+
+  if (collectStatus) {
+    collectStatus.forEach((collectStatus) => {
+      response.push({
+        ...collectStatus._doc,
+        requiredMoney: getRequiredMoney(collectStatus.money, household),
+        totalRequiredMoney: getTotalRequiredMoney(
+          collectStatus.money,
+          household
+        ),
+      });
+    });
+    haveStatusMoneysId = collectStatus.map(
+      (collectStatus) => collectStatus.money._id
+    );
+  }
+
+  const noHistoryMoney = await Money.find({
+    _id: { $nin: haveStatusMoneysId },
+  });
+
+  noHistoryMoney &&
+    noHistoryMoney.forEach((money) => {
+      response.push({
+        money: money,
+        household: householdId,
+        paidMoney: 0,
+        paidHistory: [],
+        requiredMoney: getRequiredMoney(money, household),
+        totalRequiredMoney: getTotalRequiredMoney(money, household),
+      });
+    });
+
+  return response;
+};
+
+const updateMoneyCollectStatus = async (req, res) => {
+  try {
+    const moneyId = req.params.moneyId;
+    const householdId = req.body.householdId;
+    const paidMoney = req.body.paidMoney;
+    const paidDate = new Date(req.body.paidDate).toUTCString();
+    const collectStatus = await CollectStatus.findOneAndUpdate(
+      { money: moneyId, household: householdId },
+      {
+        $inc: { paidMoney: paidMoney },
+        $push: {
+          paidHistory: {
+            $each: [{ value: paidMoney, paidDate: paidDate }],
+            $position: 0,
+          },
+        },
+      },
+      { new: true }
+    );
+    if (collectStatus === null) {
+      const newCollectStatus = new CollectStatus({
+        money: moneyId,
+        household: householdId,
+        paidMoney: paidMoney,
+        paidHistory: [
+          {
+            value: paidMoney,
+            paidDate: paidDate,
+          },
+        ],
+      });
+
+      await newCollectStatus.save();
+      res.status(200).json(newCollectStatus);
+    } else {
+      res.status(200).json(collectStatus);
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const getTotalRequiredMoney = (money, household) => {
+  const requiredMoney = getRequiredMoney(money, household);
+
+  if (requiredMoney === 0) return 0;
+
+  let numberOfCycle = 0;
+
+  const today = moment().startOf('day');
+  const startDate = moment(money.startDate).startOf('day');
+
+  if (today > startDate) {
+    numberOfCycle = Math.ceil(
+      today.diff(startDate, money.cycle.type, true) / money.cycle.value
+    );
+  } else {
+    return 0;
+  }
+
+  return numberOfCycle * requiredMoney;
+};
+
+const getRequiredMoney = (money, household) => {
+  if (money.moneyType === 1) {
+    return money.amountOfMoney * (household.members.length + (household.headMember !== undefined));
+  }
+
+  return money.amountOfMoney;
+};
+
+export {
+  getMoney,
+  editMoney,
+  addMoney,
+  getMoneyDetail,
+  getHouseholdPaidStatus,
+  updateMoneyCollectStatus,
+  deleteMoney,
+  getPeriodMoney,
+  getContributionMoney,
+};

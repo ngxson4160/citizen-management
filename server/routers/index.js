@@ -5,6 +5,7 @@ import householdRoutes from "./household.js";
 import moneyRoutes from "./money.js";
 import authRoutes from "./auth.js";
 
+
 const router = express.Router();
 router.use("/person", personRoutes);
 router.use("/household", householdRoutes);
