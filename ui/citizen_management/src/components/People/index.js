@@ -1,60 +1,50 @@
 import React from 'react';
 import DataGrid, {
   Column,
-  Editing,
-  Popup,
-  Lookup,
-  Form,
+  Selection,
+  Item,
   FilterRow,
   SearchPanel,
-  Summary,
-  TotalItem,
-  Selection,
-  Format,
   Export,
-  RequiredRule,
-  PatternRule,
+  Button,
 } from 'devextreme-react/data-grid';
-import 'devextreme-react/text-area';
-import { Item } from 'devextreme-react/form';
-import { states, cycle, directions } from '../constant.js';
+import TabPanel from 'devextreme-react/tab-panel';
+import ArrayStore from 'devextreme/data/array_store';
 import config from 'devextreme/core/config';
-import repaintFloatingActionButton from 'devextreme/ui/speed_dial_action/repaint_floating_action_button';
-import { SpeedDialAction } from 'devextreme-react/speed-dial-action';
-import { SelectBox } from 'devextreme-react/select-box';
-import { Link } from 'react-router-dom';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver';
 import { exportDataGrid } from 'devextreme/excel_exporter';
-import periodMoneyStore from './periodMoneyStore.js';
+import repaintFloatingActionButton from 'devextreme/ui/speed_dial_action/repaint_floating_action_button';
+import DataSource from 'devextreme/data/data_source';
+import { Link } from 'react-router-dom';
+import deMessages from 'devextreme/localization/messages/vi.json';
+import ruMessages from 'devextreme/localization/messages/vi.json';
+import { locale, loadMessages } from 'devextreme/localization';
+import { directions } from '../MoneyManagement/constant';
+import peopleStore from './peopleStore.js';
 import { observer } from 'mobx-react';
-import { toJS } from 'mobx';
-import './styles.css';
-import userStore from '../../../stores/userStore.js';
+import { initData } from '../../stores/constant';
+import Loading from '../Loading/index.jsx';
 
-const optionDirections = ['up'];
-const notesEditorOptions = { height: 100 };
+loadMessages(deMessages);
+loadMessages(ruMessages);
+locale(navigator.language || navigator.browserLanguage);
 
-class PeriodMoney extends React.Component {
+class People extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedRowIndex: -1,
     };
     this.grid = null;
-    this.selectionChanged = this.selectedChanged.bind(this);
-    this.directionChanged = this.directionChanged.bind(this);
-    this.addRow = this.addRow.bind(this);
-    this.deleteRow = this.deleteRow.bind(this);
-    this.editRow = this.editRow.bind(this);
-    this.onExporting = this.onExporting.bind(this);
+    this.selectionChanged = this.selectionChanged.bind(this);
   }
 
   componentDidMount() {
-    periodMoneyStore.fetchResult();
+    peopleStore.fetchResult();
   }
 
-  selectedChanged(e) {
+  selectionChanged(e) {
     this.setState({
       selectedRowIndex: e.component.getRowIndexByKey(e.selectedRowKeys[0]),
     });
@@ -78,190 +68,189 @@ class PeriodMoney extends React.Component {
     this.grid.instance.deselectAll();
   }
 
-  addRow() {
-    this.grid.instance.addRow();
-    this.grid.instance.deselectAll();
-  }
-
   render() {
-    const { selectedRowIndex } = this.state;
-    const store = periodMoneyStore;
-    const data = toJS(store.moneyList);
+    const store = peopleStore;
+
+    if (store.isLoading) return <Loading />;
 
     return (
       <div id="main">
-        <span>Thông tin các khoản thu</span>
-        <div>
-          <DataGrid
-            dataSource={data}
-            keyExpr="_id"
-            ref={(ref) => {
-              this.grid = ref;
-            }}
-            focusedRowEnabled={true}
-            onExporting={this.onExporting}
-            onRowUpdated={store.updateMoney.bind(store)}
-            onRowInserted={store.addMoney.bind(store)}
-            onRowRemoving={store.deleteMoney.bind(store)}
-            onSelectionChanged={this.selectionChanged}
-          >
-            <SearchPanel visible={true} cssClass="search" />
-            <FilterRow visible={true} />
-            <Editing mode="popup">
-              <Popup
-                title="Khoản thu"
-                showTitle={true}
-                width={700}
-                height={580}
-              />
-              <Form>
-                <Item itemType="group" colCount={2} colSpan={2}>
-                  <Item dataField="name" isRequired={true} />
-                  <Item dataField="amountOfMoney" isRequired={true} />
-                  <Item
-                    dataField="note"
-                    editorType="dxTextArea"
-                    colSpan={2}
-                    editorOptions={notesEditorOptions}
-                  />
-                </Item>
-                <Item
-                  itemType="group"
-                  caption="Phạm vi"
-                  colCount={2}
-                  colSpan={2}
-                >
-                  <Item dataField="startDate" isRequired={true} />
-                  <Item dataField="moneyType" isRequired={true} />
-                </Item>
-                <Item
-                  itemType="group"
-                  caption="Chu kỳ"
-                  colCount={2}
-                  colSpan={2}
-                >
-                  <Item dataField="cycle.value" isRequired={true} />
-                  <Item dataField="cycle.type" isRequired={true} />
-                </Item>
-              </Form>
-            </Editing>
-            <Selection mode="single" />
-            <Column
-              caption="STT"
-              cellRender={rowCount}
-              cssClass="header"
-              width={53}
-            />
-            <Column
-              dataField="name"
-              caption="Tên khoản thu"
-              cssClass="header header--name"
-              cellRender={(params) => (
-                <Link to={`/money/${params.data._id}`}>{params.value}</Link>
-              )}
-            />
-            <Column
-              dataField="startDate"
-              dataType="date"
-              caption="Ngày bắt đầu"
-              cssClass="header"
-            />
-            <Column caption="Chu kỳ" cssClass="header header-2col">
+        <TabPanel id="tabPanel" deferRendering={false}>
+          <Item title="Danh sách nhân khẩu">
+            <DataGrid
+              id="gridContainer"
+              dataSource={store.peopleList.filter(p => p.note < 3)}
+              keyExpr="_id"
+              ref={(ref) => {
+                this.grid = ref;
+              }}
+              onExporting={this.onExporting}
+              onSelectionChanged={this.selectionChanged}
+            >
+              <SearchPanel visible={true} cssClass="search" />
+              <FilterRow visible={true} />
+              <Selection mode="single" />
               <Column
-                dataField="cycle.value"
-                caption="Số lần"
+                caption="STT"
+                cellRender={rowCount}
+                cssClass="header"
+                width={53}
+              />
+              <Column
+                dataField="name"
+                caption="Họ và tên"
+                cssClass="header"
+                cellRender={(params) => (
+                  <Link to={`people/${params.data._id}`}>{params.value}</Link>
+                )}
+              />
+              <Column
+                dataField="household.apartmentNumber"
+                caption="Số hộ khẩu"
+                cssClass="header"
+                cellRender={(params) => (
+                  <Link to={`households/${params.data.household._id}`}>
+                    {params.value}
+                  </Link>
+                )}
+              />
+              <Column
+                dataField="identity.numberIdentity"
+                caption="Số CMND"
                 cssClass="header"
               />
               <Column
-                dataField="cycle.type"
-                caption="Trên"
+                dataField="household.place"
+                caption="Nơi ở hiện tại"
                 cssClass="header"
-              >
-                <Lookup
-                  dataSource={cycle}
-                  valueExpr="type"
-                  displayExpr="name"
-                />
-              </Column>
-            </Column>
-            <Column
-              dataField="amountOfMoney"
-              caption="Số tiền"
-              cssClass="header header--money"
+              />
+              <Export enabled={true} />
+            </DataGrid>
+          </Item>
+          <Item title="Tạm trú, tạm vắng">
+            <DataGrid
+              id="gridContainer"
+              dataSource={store.peopleList.filter(p => p.note == 2)}
+              keyExpr="_id"
+              ref={(ref) => {
+                this.grid = ref;
+              }}
+              onExporting={this.onExporting}
+              onSelectionChanged={this.selectionChanged}
             >
-              <RequiredRule />
-              <PatternRule
-                message={'Số tiền lớn hơn 0'}
-                pattern={/^(?!(?:0|0\.0|0\.00)$)[+]?\d+(\.\d|\.\d[0-9])?$/i}
+              <SearchPanel visible={true} cssClass="search" />
+              <FilterRow visible={true} />
+              <Selection mode="single" />
+              <Column
+                caption="STT"
+                cellRender={rowCount}
+                cssClass="header"
+                width={53}
               />
-              <Format type="fixedPoint" />
-            </Column>
-            <Column
-              dataField="moneyType"
-              caption="Loại"
-              cssClass="header"
+              <Column
+                dataField="name"
+                caption="Họ và tên"
+                cssClass="header"
+                cellRender={(params) => (
+                  <Link to={`people/${params.data._id}`}>{params.value}</Link>
+                )}
+              />
+              <Column
+                dataField="identity.numberIdentity"
+                caption="Số CMND"
+                cssClass="header"
+              />
+              <Column
+                dataField="residencyHistory"
+                caption="Địa chỉ hiện tại"
+                cssClass="header"
+                cellRender={(params) => {
+                  return params.value[params.value.length - 1].place
+                }} 
+              />
+              <Column
+                dataField="residencyHistory"
+                caption="Ngày bắt đầu"
+                cssClass="header"
+                cellRender={(params) => {
+                  const d = new Date(params.value[params.value.length - 1].date);
+                  var res = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+                  return res
+                }}
+              />
+              <Column
+                dataField="residencyHistory"
+                caption="Ghi chú"
+                cssClass="header"
+                cellRender={(params) => {
+                  return params.value[params.value.length - 1].note
+                }} 
+              />
+              <Export enabled={true} />
+            </DataGrid>
+          </Item>
+          <Item title="Khai tử">
+            <DataGrid
+              id="gridContainer"
+              dataSource={store.peopleList.filter(p => p.note === 3)}
+              keyExpr="identity"
+              onExporting={this.onExporting}
+              onSelectionChanged={this.selectionChanged}
             >
-              <Lookup
-                dataSource={states}
-                valueExpr="id"
-                displayExpr="name"
-                maxLength={2}
+              <SearchPanel visible={true} cssClass="search" />
+              <FilterRow visible={true} />
+              <Selection mode="single" />
+              <Column
+                caption="STT"
+                cellRender={rowCount}
+                cssClass="header"
+                width={53}
               />
-            </Column>
-            <Column
-              dataField="note"
-              visible={false}
-              caption="Mô tả"
-              cssClass="header"
-            />
-            <Export enabled={true} />
-            <Summary recalculateWhileEditing={true}>
-              <TotalItem
-                column="amountOfMoney"
-                cssClass="sum-money"
-                summaryType="sum"
-                valueFormat="fixedPoint"
-                displayFormat="{0}"
+              <Column
+                dataField="name"
+                caption="Họ và tên"
+                width={220}
+                cssClass="header"
+                cellRender={(params) => (
+                  <Link to={`people/${params.data._id}`}>
+                    {params.value}
+                  </Link>
+                )}
               />
-            </Summary>
-          </DataGrid>
-          {userStore.userDetail.role < 3 && (
-            <React.Fragment>
-              <SpeedDialAction
-                icon="add"
-                label="Thêm khoản thu"
-                index={1}
-                onClick={this.addRow}
+              <Column
+                dataField="deathReport.reportPerson.name"
+                caption="Tên người khai tử"
+                cssClass="header"
+                cellRender={(params) => (
+                  <Link to={`people/${params.data.deathReport.reportPerson._id}`}>
+                    {params.value}
+                  </Link>
+                )}
               />
-              <SpeedDialAction
-                icon="trash"
-                label="Xoá khoản thu"
-                index={2}
-                onClick={this.deleteRow}
-                visible={
-                  selectedRowIndex !== undefined && selectedRowIndex !== -1
-                }
+              <Column
+                dataField="deathReport.deathReason"
+                caption="Nguyên nhân tử vong"
+                cssClass="header"
               />
-              <SpeedDialAction
-                icon="edit"
-                label="Chỉnh sửa khoản thu"
-                index={3}
-                onClick={this.editRow}
-                visible={
-                  selectedRowIndex !== undefined && selectedRowIndex !== -1
-                }
+              <Column
+                dataField="deathReport.deathDay"
+                caption="Ngày tử vong"
+                cssClass="header"
+                cellRender={(params) => {
+                  const d = new Date(params.value);
+                  var res = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+                  return <div>{res}</div>
+                }}
               />
-              <div>
-                <SelectBox
-                  dataSource={optionDirections}
-                  defaultValue="up"
-                  visible={false}
-                  onSelectionChanged={this.directionChanged}
-                />
-              </div>
-            </React.Fragment>
-          )}
-        </div>
+              <Column
+                dataField="deathReport.deathPlace"
+                caption="Nơi tử vong"
+                cssClass="header"
+              />
+              <Export enabled={true} />
+            </DataGrid>
+          </Item>
+        </TabPanel>
       </div>
     );
   }
@@ -278,7 +267,7 @@ class PeriodMoney extends React.Component {
       workbook.xlsx.writeBuffer().then((buffer) => {
         saveAs(
           new Blob([buffer], { type: 'application/octet-stream' }),
-          'Các khoản thu.xlsx'
+          'Danh sách nhân khẩu.xlsx'
         );
       });
     });
@@ -293,4 +282,4 @@ const rowCount = function (info) {
   return <div>{index}</div>;
 };
 
-export default observer(PeriodMoney);
+export default observer(People);

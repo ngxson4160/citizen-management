@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Alert } from 'reactstrap';
-import style from './Alert.module.scss';
+import { useEffect, useState } from "react";
+import { Alert } from "reactstrap";
+import style from "./Alert.module.scss";
 
-import { alertService } from './alert.service.js';
+import { alertService } from "./alert.service.js";
 
-const AlertCustom = ({ id = 'default-alert' }) => {
+const AlertCustom = ({ id = "default-alert" }) => {
   const [alert, setAlert] = useState(null);
 
   useEffect(() => {
@@ -25,7 +25,10 @@ const AlertCustom = ({ id = 'default-alert' }) => {
   return (
     <>
       {alert ? (
-        <Alert className={style['alert']} color={alert.type}>
+        <Alert
+          className={style["alert"]}
+          color={alert.type}
+        >
           {alert.message}
         </Alert>
       ) : (
