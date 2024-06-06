@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Route, Switch, withRouter } from 'react-router-dom';
 
+
 import Account from '../Account/Account';
 import AlertCustom from '../Alert';
 import Header from '../Header';
@@ -52,6 +53,53 @@ class App extends React.Component {
         <Route path={routingPaths.account} component={Account} />
         <Route component={NotFoundPage} />
       </Switch>
+    );
+  }
+
+  getAuthorizedPage() {
+    return (
+      <Switch>
+        <Route exact path={routingPaths.home} component={Home} />
+        <Route exact path={routingPaths.people} component={People} />
+        <Route path={routingPaths.personDetail} component={PersonDetail} />
+        <Route exact path={routingPaths.households} component={Household} />
+        <Route
+          path={routingPaths.householdDetail}
+          component={HouseholdDetail}
+        />
+        <Route exact path={routingPaths.periodMoney} component={PeriodMoney} />
+        <Route
+          exact
+          path={routingPaths.contributionMoney}
+          component={ContributionMoney}
+        />
+        <Route path={routingPaths.moneyDetail} component={MoneyDetail} />
+        <Route path={routingPaths.account} component={NotFoundPage} />
+        <Route component={NotFoundPage} />
+      </Switch>
+    );
+  }
+
+  componentDidMount() {
+    userStore.getUserDetail();
+  }
+
+  render() {
+    let size = commonStore.isFullSize ? ' full' : '';
+    if (userStore.isSignIn) userStore.renderSignInAlert();
+    if (userStore.isSignUp) userStore.renderSignUpAlert();
+    if (userStore.isSignOut) userStore.renderSignOutAlert();
+
+    return (
+      <div>
+        <AlertCustom />
+        <LeftSideBar />
+        <Header />
+        <div className={'page-wrapper' + size}>
+          {userStore.userDetail && this.getAuthorizedPage()}
+          {!userStore.userDetail && this.getUnAuthorizedPage()}
+        </div>
+      </div>
     );
   }
 }
