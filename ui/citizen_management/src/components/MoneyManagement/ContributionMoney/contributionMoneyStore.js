@@ -25,6 +25,10 @@ class ContributionMoney {
   }
 
   addMoney(money) {
+    if (money.data.amountOfMoney < 0) {
+      alertService.error("Amount of money cannot be negative");
+      return;
+    }
     APIS.money
       .addMoney(money.data)
       .then((res) => {
