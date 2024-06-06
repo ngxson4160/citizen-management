@@ -6,13 +6,15 @@ import mongoose from 'mongoose';
 
 const getPeople = async (req, res) => {
   try {
-    const people = await Person.find().populate('household identity').populate({
-      path: 'deathReport',
-      populate: {
-        path: 'reportPerson',
-        select: 'name _id'
-      }
-    });
+    const people = await Person.find()
+      .populate('household identity')
+      .populate({
+        path: 'deathReport',
+        populate: {
+          path: 'reportPerson',
+          select: 'name _id',
+        },
+      });
 
     res.status(200).json(people);
   } catch (error) {
