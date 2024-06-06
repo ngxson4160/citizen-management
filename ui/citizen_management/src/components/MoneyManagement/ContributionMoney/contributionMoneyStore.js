@@ -63,4 +63,5 @@ class ContributionMoney {
   }
 }
 
+
 export default new ContributionMoney();
