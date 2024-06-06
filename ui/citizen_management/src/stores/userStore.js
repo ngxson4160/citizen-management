@@ -11,16 +11,16 @@ class UserStore {
     rePassword: '',
     fullname: '',
     hasAgreed: false,
-    oldPassword:'',
-    newPassword:'',
-    renewPassword:''
+    oldPassword: '',
+    newPassword: '',
+    renewPassword: '',
   };
   changePass = {
     username: '',
-    oldPassword:'',
-    newPassword:'',
-    renewPassword:'',
-  }
+    oldPassword: '',
+    newPassword: '',
+    renewPassword: '',
+  };
   userDetail = null;
   isSignIn = null;
   isSignUp = null;
@@ -29,18 +29,18 @@ class UserStore {
   constructor() {
     makeObservable(this, {
       options: observable,
-      changePass:observable,
+      changePass: observable,
       userDetail: observable,
       isSignIn: observable,
       isSignUp: observable,
       isSignOut: observable,
       getUserDetail: action,
       handleInputChange: action,
-      handlePassChange:action,
+      handlePassChange: action,
       signIn: action,
       signUp: action,
       signOut: action,
-      changePassword:action,
+      changePassword: action,
       renderSignInAlert: action,
       renderSignUpAlert: action,
       renderSignOutAlert: action,
@@ -81,16 +81,21 @@ class UserStore {
     this.options[name] = value;
   }
   handlePassChange(event) {
-    console.log("check event:", event);
+    console.log('check event:', event);
     let target = event.target;
     let value = target.value;
     let name = target.name;
     this.changePass[name] = value;
     console.log(this.changePass);
   }
-  validateChangePass(){
-    if(this.changePass.newPassword!=this.changePass.renewPassword){
+  validateChangePass() {
+    console.log(this.options.newPassword, this.options.renewPassword);
+    if (this.options.newPassword !== this.options.renewPassword) {
       alertService.error('Nhập lại mật khẩu khác mật khẩu đã nhập');
+      return false;
+    }
+    if (this.options.newPassword.length < 6) {
+      alertService.error('Mật khẩu của bạn cần có ít nhất 6 kí tự');
       return false;
     }
     return true;
@@ -146,21 +151,22 @@ class UserStore {
       })
       .catch((e) => alertService.error(e.response.data));
   }
-  changePassword(){
-    if(!this.validateChangePass())
-      return;
+  changePassword() {
+    console.log("run hehe", this.validateChangePass())
+    if (!this.validateChangePass()) return;
+
     APIS.user
       .changePassword({
         username: this.userDetail.username,
         oldPassword: this.options.oldPassword,
         newPassword: this.options.newPassword,
       })
-      .then( (res)=>{
-         alertService.success(res.data.message);
+      .then((res) => {
+        alertService.success(res.data.message);
       })
-      .catch((e)=>{
+      .catch((e) => {
         alertService.error(e.response.data);
-      })
+      });
   }
 
   signOut(e) {

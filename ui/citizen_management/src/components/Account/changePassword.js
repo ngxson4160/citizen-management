@@ -10,13 +10,13 @@ class ChangePassword extends Component {
         <div className="formCenter">
         <form className="formFields">
           <div className="formField">
-            <label className="formFieldLabel" htmlFor="oldPassword">
+            <label className="formFieldLabelChangePassword" htmlFor="oldPassword">
               Nhập mật khẩu
             </label>
             <input
               type="password"
               id="old-password"
-              className="formFieldInput"
+              className="formFieldInputChangePassword"
               placeholder="Nhập mật khẩu"
               name="oldPassword"
             //  value={userStore.options.oldPassword}
@@ -26,13 +26,13 @@ class ChangePassword extends Component {
           </div>
 
           <div className="formField">
-            <label className="formFieldLabel" htmlFor="newPassword">
+            <label className="formFieldLabelChangePassword" htmlFor="newPassword">
               Mật khẩu mới
             </label>
             <input
               type="password"
               id="new-password"
-              className="formFieldInput"
+              className="formFieldInputChangePassword"
               placeholder="Nhập mật khẩu mới"
               name="newPassword"
               value={userStore.options.newPassword}
@@ -41,13 +41,13 @@ class ChangePassword extends Component {
             />
           </div>
           <div className="formField">
-            <label className="formFieldLabel" htmlFor="renewPassword">
+            <label className="formFieldLabelChangePassword" htmlFor="renewPassword">
               Nhập lại mật khẩu mới
             </label>
             <input
               type="password"
               id="new-password-confirm"
-              className="formFieldInput"
+              className="formFieldInputChangePassword"
               placeholder="Nhập lại mật khẩu mới"
               name="renewPassword"
            value={userStore.options.renewPassword}

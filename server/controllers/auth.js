@@ -1,5 +1,5 @@
-import User from "../models/user.js";
-import bcrypt from "bcrypt";
+import User from '../models/user.js';
+import bcrypt from 'bcrypt';
 
 const signIn = async (req, res) => {
   try {
@@ -9,10 +9,10 @@ const signIn = async (req, res) => {
     const user = await User.findOne({ username: username });
 
     if (!user) {
-      res.status(400).json("Tài khoản không tồn tại");
+      res.status(400).json('Tài khoản không tồn tại');
     } else {
       const validPassword = await bcrypt.compare(password, user.password);
-      !validPassword && res.status(400).json("Sai mật khẩu");
+      !validPassword && res.status(400).json('Sai mật khẩu');
       res.status(200).json(user);
     }
   } catch (error) {
@@ -40,17 +40,17 @@ const signUp = async (req, res) => {
       await newUser.save();
       res.status(200).json(newUser);
     } else {
-      res.status(400).json("Tên đăng nhập đã có người sử dụng");
+      res.status(400).json('Tên đăng nhập đã có người sử dụng');
     }
   } catch (e) {
     res.status(500).json(error);
   }
 };
 
-const changePassword =  async (req, res) => {
+const changePassword = async (req, res) => {
   try {
     const { username, oldPassword, newPassword } = req.body;
-    console.log({username,oldPassword,newPassword});
+    console.log({ username, oldPassword, newPassword });
     // Tìm người dùng trong cơ sở dữ liệu
     const user = await User.findOne({ username });
 
@@ -61,7 +61,8 @@ const changePassword =  async (req, res) => {
     }
 
     // Mã hóa mật khẩu mới và cập nhật trong cơ sở dữ liệu
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
     user.password = hashedPassword;
     await user.save();
 
@@ -71,6 +72,5 @@ const changePassword =  async (req, res) => {
     res.status(500).json({ message: 'Có lỗi xảy ra khi cập nhật mật khẩu' });
   }
 };
-
 
 export { signIn, signUp, changePassword };
