@@ -199,28 +199,51 @@ const separationHousehold = async (req, res) => {
       });
     }
 
-    people.forEach(async (per) => {
+    // people.forEach(async (per) => {
+    //   const person = await Person.findOne({ _id: per.id });
+    //   await deletePersonFromHousehold(person);
+    //   if (per.relationship == 0) {
+    //     household.headMember = per.id;
+    //     await household.save();
+    //   } else {
+    //     household.members.push(per.id);
+    //     await household.save();
+    //   }
+
+    //   person.relationship = per.relationship;
+    //   person.household = household._id;
+    //   person.note = 0;
+    //   await person.save();
+
+    //   household.change.push({
+    //     content: `Thêm nhân khẩu: ${person.name}`,
+    //     date: Date.now(),
+    //   });
+    //   await household.save();
+    // });
+
+    for (const per of people) {
       const person = await Person.findOne({ _id: per.id });
       await deletePersonFromHousehold(person);
+    
       if (per.relationship == 0) {
         household.headMember = per.id;
-        await household.save();
       } else {
         household.members.push(per.id);
-        await household.save();
       }
-
+    
       person.relationship = per.relationship;
       person.household = household._id;
       person.note = 0;
       await person.save();
-
+    
       household.change.push({
         content: `Thêm nhân khẩu: ${person.name}`,
         date: Date.now(),
       });
+    
       await household.save();
-    });
+    }
 
     res.status(201).json('Tách hộ khẩu thành công');
   } catch (error) {

@@ -171,12 +171,12 @@ const EditPerson = ({ person, setTopComp }) => {
               Trạng thái
             </Label>
             <Col sm={1} style={{ width: '12.21%' }}>
-              <Input type="select" onChange={(e) => setNote(e.target.value)}>
-                {initData.notePerson.map((note, index) => {
+              <Input type="select" onChange={(e) => setNote(e.target.value)} value={note}>
+                {initData.notePerson.map((notePer, index) => {
                   if (index === 0 || index === 1)
                     return (
                       <option key={index} value={index}>
-                        {note}
+                        {notePer}
                       </option>
                     );
                   else return <></>;
@@ -276,7 +276,7 @@ const EditPerson = ({ person, setTopComp }) => {
           <Button
             className="btn-react"
             color="secondary"
-            type="button"
+            type="submit"
             onClick={editPerson}
           >
             Chỉnh sửa nhân khẩu
