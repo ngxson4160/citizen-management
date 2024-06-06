@@ -1,0 +1,42 @@
+.home{
+    width: 100%;
+    padding-left: 2em;
+    font-size: 25px;
+}
+
+.manage--title{
+    font-size: 30px;
+    font-weight: 700;
+    margin: 25px;
+}
+
+.home-item{
+    flex: 1;
+    margin: 20px 70px 5px 10px;
+    padding: 25px 15px 30px 20px;
+    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.5); 
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.5);
+    border-radius: 20px;
+    text-align: center;
+}
+
+.home-paper, .home-now{
+    display:flex;
+    justify-content: space-between;
+}
+
+.home-quantum{
+    text-align: center;
+    padding-bottom: 0px;
+}
+
+.chart-title{
+    text-align: center;
+    padding-top: 15px;
+}
+
+.no-login{
+    min-height: 90vh;
+    background: url(https://scontent-hkg4-2.xx.fbcdn.net/v/t1.15752-9/445821571_1011899460293635_8818237510472006702_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=5f2048&_nc_ohc=Ko46VwKJ8fYQ7kNvgGMjHJe&_nc_ht=scontent-hkg4-2.xx&oh=03_Q7cD1QGgLtKMfTZ8EQ5DwBHbQVI5o9nkzplN9ILJsPFWMd5LNg&oe=668678FA) no-repeat;
+    background-size: cover;
+}

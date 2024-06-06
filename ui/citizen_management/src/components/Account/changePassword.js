@@ -10,7 +10,7 @@ class ChangePassword extends Component {
         <div className="formCenter">
         <form className="formFields">
           <div className="formField">
-            <label className="formFieldLabel" htmlFor="username">
+            <label className="formFieldLabel" htmlFor="oldPassword">
               Nhập mật khẩu
             </label>
             <input
@@ -18,14 +18,15 @@ class ChangePassword extends Component {
               id="old-password"
               className="formFieldInput"
               placeholder="Nhập mật khẩu"
-              name="old-password"
-              
+              name="oldPassword"
+            //  value={userStore.options.oldPassword}
+              onChange={userStore.handleInputChange.bind(userStore)}
               required
             />
           </div>
 
           <div className="formField">
-            <label className="formFieldLabel" htmlFor="password">
+            <label className="formFieldLabel" htmlFor="newPassword">
               Mật khẩu mới
             </label>
             <input
@@ -33,12 +34,14 @@ class ChangePassword extends Component {
               id="new-password"
               className="formFieldInput"
               placeholder="Nhập mật khẩu mới"
-              name="new-password"
+              name="newPassword"
+              value={userStore.options.newPassword}
+              onChange={userStore.handleInputChange.bind(userStore)}
               required
             />
           </div>
           <div className="formField">
-            <label className="formFieldLabel" htmlFor="password">
+            <label className="formFieldLabel" htmlFor="renewPassword">
               Nhập lại mật khẩu mới
             </label>
             <input
@@ -46,7 +49,9 @@ class ChangePassword extends Component {
               id="new-password-confirm"
               className="formFieldInput"
               placeholder="Nhập lại mật khẩu mới"
-              name="new-password-confirm"
+              name="renewPassword"
+           value={userStore.options.renewPassword}
+              onChange={userStore.handleInputChange.bind(userStore)}
               required
             />
           </div>
@@ -54,7 +59,7 @@ class ChangePassword extends Component {
         <div className="formField submit-btn">
           <button
             className="formFieldButton"
-            
+            onClick={userStore.changePassword.bind(userStore)}
           >
             Đổi mật khẩu 
           </button>
@@ -64,4 +69,4 @@ class ChangePassword extends Component {
     }
   }
 
-  export default ChangePassword;
+  export default observer(ChangePassword);

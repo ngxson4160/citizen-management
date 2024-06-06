@@ -93,5 +93,6 @@ router.post("/sign-in", authController.signIn);
  *         description: The message of errors
  */
 router.post("/sign-up", authController.signUp);
+router.post("/change-password", authController.changePassword);
 
 export default router;

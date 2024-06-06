@@ -47,4 +47,30 @@ const signUp = async (req, res) => {
   }
 };
 
-export { signIn, signUp };
+const changePassword =  async (req, res) => {
+  try {
+    const { username, oldPassword, newPassword } = req.body;
+    console.log({username,oldPassword,newPassword});
+    // Tìm người dùng trong cơ sở dữ liệu
+    const user = await User.findOne({ username });
+
+    // Kiểm tra xem mật khẩu cũ có đúng không
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(200).json({ message: 'Mật khẩu cũ không đúng' });
+    }
+
+    // Mã hóa mật khẩu mới và cập nhật trong cơ sở dữ liệu
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Mật khẩu đã được cập nhật thành công' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Có lỗi xảy ra khi cập nhật mật khẩu' });
+  }
+};
+
+
+export { signIn, signUp, changePassword };
