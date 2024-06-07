@@ -52,7 +52,12 @@ class MoneyDetailStore {
         alertService.success(
           `Cập nhật khoản tiền nộp cho hộ ${money.oldData.household.apartmentNumber} thành công`
         );
+      })
+      .catch((e) => {
+        const errorMessage = e.response?.data?.error || 'An error occurred';
+        alertService.error(errorMessage);
       });
+      
   }
 }
 
