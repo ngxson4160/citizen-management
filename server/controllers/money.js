@@ -254,8 +254,8 @@ const updateMoneyCollectStatus = async (req, res) => {
     }
 
     // Kiểm tra ngày trả tiền không sớm hơn ngày hiện tại
-    const start = new Date(currentDate);
     const currentDate = new Date();
+    const start = new Date(currentDate);
     if (start < currentDate) {
       return res.status(400).json({ error: "Ngày trả tiền không thể sớm hơn ngày hiện tại." });
     }

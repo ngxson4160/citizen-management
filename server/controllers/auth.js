@@ -12,8 +12,11 @@ const signIn = async (req, res) => {
       res.status(400).json('Tài khoản không tồn tại');
     } else {
       const validPassword = await bcrypt.compare(password, user.password);
-      !validPassword && res.status(400).json('Sai mật khẩu');
-      res.status(200).json(user);
+      if (!validPassword) {
+        return res.status(400).json('Sai mật khẩu');
+      } else {
+        return res.status(200).json(user);
+      }
     }
   } catch (error) {
     res.status(500).json(error);
