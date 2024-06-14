@@ -39,6 +39,21 @@ const addMoney = async (req, res) => {
     const amountOfMoney = req.body.amountOfMoney;
     const moneyType = req.body.moneyType;
 
+    const start = new Date(startDate);
+    const now = new Date();
+
+    if(now < start) {
+      return res.status(400).json({error: "Ngày hiện tại nhỏ hơn ngày bắt đầu"});
+    }
+
+    if(amountOfMoney < 0) {
+      return res.status(400).json({error: "Số tiền nhỏ hơn 0"});
+    }
+
+    if(cycle <= 0) {
+      return res.status(400).json({error: "Chu kì không hợp lệ"});
+    }
+
     const money = new Money({
       name: name,
       startDate: startDate,
@@ -54,6 +69,8 @@ const addMoney = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+
 
 const editMoney = async (req, res) => {
   try {
@@ -73,6 +90,16 @@ const editMoney = async (req, res) => {
     money.cycle = cycle;
     money.note = note;
     money.moneyType = moneyType;
+
+    const start = new Date(startDate);
+    const now = new Date();
+    if(now < start) {
+      return res.status(400).json({error: "Ngày hiện tại không thể nhỏ hơn ngày bắt đầu"});
+    }
+    if(amountOfMoney < 0) {
+      return res.status(400).json({error: "Số tiền không thể âm"});
+    }
+
     await money.save();
 
     res.status(201).json(money);
@@ -219,7 +246,20 @@ const updateMoneyCollectStatus = async (req, res) => {
     const moneyId = req.params.moneyId;
     const householdId = req.body.householdId;
     const paidMoney = req.body.paidMoney;
-    const paidDate = new Date(req.body.paidDate).toUTCString();
+    const paidDate = new Date(req.body.paidDate);
+
+    // Kiểm tra số tiền không âm
+    if (paidMoney < 0) {
+      return res.status(400).json({ error: "Số tiền không thể là số âm." });
+    }
+
+    // Kiểm tra ngày trả tiền không sớm hơn ngày hiện tại
+    const currentDate = new Date();
+    const start = new Date(currentDate);
+    if (start < currentDate) {
+      return res.status(400).json({ error: "Ngày trả tiền không thể sớm hơn ngày hiện tại." });
+    }
+
     const collectStatus = await CollectStatus.findOneAndUpdate(
       { money: moneyId, household: householdId },
       {

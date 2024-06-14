@@ -28,11 +28,15 @@ class ContributionMoney {
     APIS.money
       .addMoney(money.data)
       .then((res) => {
-        this.moneyList[money.component.getRowIndexByKey(money.key)] = res.data;
+        this.moneyList.push(res.data);
         alertService.success('Thêm khoản đóng góp thành công');
       })
-      .catch((e) => alertService.error(e.response.data));
+      .catch((e) => {
+        const errorMessage = e.response?.data?.error || 'An error occurred';
+        alertService.error(errorMessage);
+      });
   }
+  
 
   updateMoney(money) {
     const pos = this.moneyList.findIndex(
@@ -62,5 +66,6 @@ class ContributionMoney {
       .catch((e) => alertService.error(e.response.data));
   }
 }
+
 
 export default new ContributionMoney();

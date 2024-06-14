@@ -166,6 +166,7 @@ class MoneyDetail extends React.Component {
             visible={false}
             caption={moneyDetail.moneyType === 2 ? 'Tiền đóng góp' : 'Tiền nộp'}
           />
+          
           {userStore.userDetail.role < 3 && (
             <Column type="buttons" visible={true} cssClass="header">
               <Button name="edit" icon="edit" />

@@ -31,9 +31,12 @@ class PeriodMoneyStore {
         this.moneyList.push(res.data);
         alertService.success('Thêm khoản thu thành công');
       })
-      .catch((e) => alertService.error(e.response.data));
+      .catch((e) => {
+        const errorMessage = e.response?.data?.error || 'An error occurred';
+        alertService.error(errorMessage);
+      });
   }
-
+  
   updateMoney(money) {
     const pos = this.moneyList.findIndex(
       (element) => element._id === money.data._id
